@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jQuery CRUD Operations</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+  <h1>Products</h1>
+
+  <ul id="productList"></ul>
+
+  <input type="text" id="productName">
+  <button onclick="createProduct()">Add Product</button>
+
+  <script>
+    const baseURL = 'https://api.example.com'; // Replace this with your API base URL
+
+    // Function to retrieve all products
+    function getAllProducts() {
+      $.ajax({
+        url: `${baseURL}/products`,
+        type: 'GET',
+        success: function(products) {
+          displayProducts(products);
+        },
+        error: function(error) {
+          console.error('Error getting products:', error);
+        }
+      });
+    }
+
+    // Function to create a new product
+    function createProduct() {
+      const productName = $('#productName').val();
+      $.ajax({
+        url: `${baseURL}/products`,
+        type: 'POST',
+        data: { name: productName },
+        success: function(newProduct) {
+          console.log('Product created:', newProduct);
+          getAllProducts(); // Refresh the product list after creation
+        },
+        error: function(error) {
+          console.error('Error creating product:', error);
+        }
+      });
+    }
+
+    // Function to delete a product
+    function deleteProduct(productId) {
+      $.ajax({
+        url: `${baseURL}/products/${productId}`,
+        type: 'DELETE',
+        success: function() {
+          console.log('Product deleted');
+          getAllProducts(); // Refresh the product list after deletion
+        },
+        error: function(error) {
+          console.error('Error deleting product:', error);
+        }
+      });
+    }
+
+    // Function to display products in the UI
+    function displayProducts(products) {
+      const productList = $('#productList');
+      productList.empty(); // Clear the previous list
+
+      products.forEach(function(product) {
+        const listItem = $('<li>');
+        listItem.text(product.name);
+
+        const deleteButton = $('<button>Delete</button>');
+        deleteButton.click(function() {
+          deleteProduct(product.id);
+        });
+
+        listItem.append(deleteButton);
+        productList.append(listItem);
+      });
+    }
+
+    // Load products when the page is ready
+    $(document).ready(function() {
+      getAllProducts();
+    });
+  </script>
+</body>
+</html>
